@@ -601,26 +601,50 @@ function showPaymentModal() {
         `;
     }).join('');
 
+    const sellersCount = Object.values(groups).length;
+    const subtitleHtml = sellersCount > 1 ? `<p class="payment-subtitle">Your cart contains items from multiple sellers. Select one seller to purchase now; repeat for other sellers later.</p>` : `<p class="payment-subtitle">Choose your payment method</p>`;
+
+    const listHtml = sellersCount > 1 ? `<div class="seller-list">${groupEntries}</div>` : '';
+    const actionsHtml = sellersCount > 1 ? `<div class="seller-actions" style="margin-top:1rem;"><button class="btn" onclick="proceedToSellerPayment()">Proceed to Payment for Selected Seller</button></div>` : '';
+
     paymentModal.innerHTML = `
         <div class="payment-content single">
             <button class="payment-close" onclick="closePaymentModal()">×</button>
             <h2>Checkout — Select a Seller</h2>
-            <p class="payment-subtitle">Your cart contains items from multiple sellers. Select one seller to purchase now; repeat for other sellers later.</p>
-            <div class="seller-list">
-                ${groupEntries}
-            </div>
-            <div class="seller-actions" style="margin-top:1rem;">
-                <button class="btn" onclick="proceedToSellerPayment()">Proceed to Payment for Selected Seller</button>
-            </div>
+            ${subtitleHtml}
+            ${listHtml}
+            ${actionsHtml}
             <div style="margin-top:1rem; font-size:0.9rem; color:#666;">After you complete payment for a seller, their items will be checked out and removed from your cart.</div>
         </div>
     `;
 
     document.body.appendChild(paymentModal);
-    // auto-open the initially selected seller's payment options
+    // auto-open behavior: if multiple sellers, open checked radio; if single seller, skip selection UI and open its payment options directly
     setTimeout(() => {
-        const sel = document.querySelector('input[name="selectedSeller"]:checked');
-        if (sel) selectSellerRadio(sel.value);
+        if (sellersCount > 1) {
+            const sel = document.querySelector('input[name="selectedSeller"]:checked');
+            if (sel) selectSellerRadio(sel.value);
+        } else if (sellersCount === 1) {
+            try {
+                const single = Object.values(groups)[0];
+                const safeKey = single.key.replace(/[^a-zA-Z0-9_-]/g, '_');
+                // remove the empty seller-list and show the group's payment area directly
+                const listEl = document.querySelector('.seller-list');
+                if (listEl) listEl.style.display = 'none';
+                // ensure a container exists in the modal for the group's payment UI
+                const content = document.querySelector('.payment-content');
+                if (content) {
+                    let gp = document.getElementById(`group_payment_${safeKey}`);
+                    if (!gp) {
+                        gp = document.createElement('div');
+                        gp.id = `group_payment_${safeKey}`;
+                        gp.className = 'group-payment';
+                        content.appendChild(gp);
+                    }
+                }
+                openGroupPayment(safeKey);
+            } catch (e) {}
+        }
     }, 80);
 }
 
