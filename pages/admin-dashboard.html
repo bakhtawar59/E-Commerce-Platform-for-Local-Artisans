@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - E-Commerce Platform for Local Artisans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-hands"></i>
+                <span>E-Commerce Platform</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('overview')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('sellers')">
+                    <i class="fas fa-store"></i>
+                    <span>Sellers</span>
+                    <span class="badge" id="pendingSellersBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('buyers')">
+                    <i class="fas fa-users"></i>
+                    <span>Buyers</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('products')">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                    <span class="badge" id="pendingProductsBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('orders')">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('reports')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <h2 id="pageTitle">Dashboard Overview</h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search...">
+                    </div>
+                    <button class="btn btn-small" onclick="openUserModal()" title="Manage Users">
+                        <i class="fas fa-users-cog"></i> Manage Users
+                    </button>
+                    <div class="user-menu">
+                        <span id="adminName">Admin</span>
+                        <div class="avatar">A</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section class="dashboard-section active" id="overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalBuyers">0</h3>
+                            <p>Total Buyers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-store"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalSellers">0</h3>
+                            <p>Total Sellers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-box"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalProducts">0</h3>
+                            <p>Total Products</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalRevenue">PKR 0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                        <div class="activity-list" id="activityList"></div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-chart-pie"></i> Platform Stats</h3>
+                        <div class="chart-placeholder">
+                            <div class="mini-chart">
+                                <div class="bar" style="height: 60%;"></div>
+                                <div class="bar" style="height: 80%;"></div>
+                                <div class="bar" style="height: 45%;"></div>
+                                <div class="bar" style="height: 90%;"></div>
+                                <div class="bar" style="height: 70%;"></div>
+                                <div class="bar" style="height: 55%;"></div>
+                            </div>
+                            <p>Weekly platform activity</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin users quick view -->
+                <div class="card">
+                    <h3><i class="fas fa-users"></i> Recent Users</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Name / Shop</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;">
+                        <div>
+                            <button class="btn" onclick="openUserModal()">Manage All Users</button>
+                        </div>
+                        <div>
+                            <button class="btn-small" onclick="prevAdminUsersPage()">Prev</button>
+                            <button class="btn-small" onclick="nextAdminUsersPage()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sellers Section -->
+            <section class="dashboard-section" id="sellers">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-store"></i> Seller Management</h3>
+                        <div class="filter-tabs">
+                            <button class="tab active" onclick="filterSellers('all')">All</button>
+                            <button class="tab" onclick="filterSellers('pending')">Pending Approval</button>
+                            <button class="tab" onclick="filterSellers('approved')">Approved</button>
+                            <button class="tab" onclick="filterSellers('rejected')">Rejected</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Shop Name</th>
+                                    <th>Owner</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sellersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Buyers Section -->
+            <section class="dashboard-section" id="buyers">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> Buyer Management</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Orders</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="buyersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section class="dashboard-section" id="products">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-box"></i> Product Approval</h3>
+                        <div class="filter-tabs">
+                            <button class="tab active" onclick="filterProducts('all')">All</button>
+                            <button class="tab" onclick="filterProducts('pending')">Pending</button>
+                            <button class="tab" onclick="filterProducts('approved')">Approved</button>
+                            <button class="tab" onclick="filterProducts('rejected')">Rejected</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Seller</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="dashboard-section" id="orders">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-shopping-cart"></i> All Orders</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer</th>
+                                    <th>Products</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section class="dashboard-section" id="reports">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-info">
+                            <h3>+23%</h3>
+                            <p>Growth This Month</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3>98%</h3>
+                            <p>Approval Rate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-file-export"></i> Generate Reports</h3>
+                    <div class="report-actions">
+                        <button class="btn" onclick="showToast('Sales report downloaded!')">
+                            <i class="fas fa-download"></i> Sales Report
+                        </button>
+                        <button class="btn" onclick="showToast('User report downloaded!')">
+                            <i class="fas fa-download"></i> User Report
+                        </button>
+                        <button class="btn" onclick="showToast('Product report downloaded!')">
+                            <i class="fas fa-download"></i> Product Report
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Message</span>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+
+    <!-- Users Modal -->
+    <div class="modal" id="userModal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle" style="display:none;">
+        <div class="modal-content" style="max-width:900px;" tabindex="-1">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Manage Users</h3>
+                <button onclick="closeUserModal()" class="close-modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-controls-row">
+                    <div class="control-group">
+                        <label class="control-label" for="showAdminsToggle">Show Admins</label>
+                        <input id="showAdminsToggle" type="checkbox" onchange="toggleShowAdmins(this.checked)" title="Show admin accounts in lists">
+                    </div>
+                    <div class="reset-wrapper">
+                        <button id="resetDemoBtn" class="btn btn-reset" onclick="showResetInline()">Reset Demo Data</button>
+                        <div id="resetConfirmInline" class="reset-confirm" style="display:none;" aria-live="polite">
+                            <span>Confirm reset?</span>
+                            <button class="btn-small btn-danger" onclick="doResetDemo()">Reset</button>
+                            <button class="btn-small btn-secondary" onclick="cancelResetInline()">Cancel</button>
+                        </div>
+                    </div>
+                    <input id="usersSearch" class="control-input" placeholder="Search users..." oninput="onUsersSearch()">
+                    <select id="usersSort" class="control-select" onchange="onUsersSort()">
+                        <option value="createdDesc">Newest</option>
+                        <option value="createdAsc">Oldest</option>
+                        <option value="nameAsc">Name A→Z</option>
+                        <option value="nameDesc">Name Z→A</option>
+                        <option value="role">Role</option>
+                    </select>
+                    <select id="usersPageSize" class="control-select" onchange="onUsersPageSizeChange()">
+                        <option value="6">6 / page</option>
+                        <option value="12">12 / page</option>
+                        <option value="24">24 / page</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Name / Shop</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+                    <div>
+                        <button class="btn-small" onclick="usersPrevPage()">Prev</button>
+                        <button class="btn-small" onclick="usersNextPage()">Next</button>
+                    </div>
+                    <div id="usersPagerInfo" style="font-size:0.9rem;color:#666"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

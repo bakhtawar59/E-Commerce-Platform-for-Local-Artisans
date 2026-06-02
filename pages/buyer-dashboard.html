@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - E-Commerce Platform for Local Artisans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-hands"></i>
+                <span>E-Commerce Platform</span>
+            </div>
+            
+            <div class="seller-info">
+                <div class="seller-avatar" id="buyerAvatar">B</div>
+                <div class="seller-details">
+                    <h4 id="buyerName">Buyer</h4>
+                    <span class="status-badge approved">Verified</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('overview', event)">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('orders', event)">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>My Orders</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('wishlist', event)">
+                    <i class="fas fa-heart"></i>
+                    <span>Wishlist</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('addresses', event)">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Addresses</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('profile', event)">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h2 id="pageTitle">My Account</h2>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-small">
+                        <i class="fas fa-store"></i> Continue Shopping
+                    </a>
+                    <div class="user-menu">
+                        <span id="headerBuyerName">Buyer</span>
+                        <div class="avatar" id="headerBuyerAvatar">B</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section class="dashboard-section active" id="overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="stat-info">
+                            <h3 id="buyerOrderCount">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3 id="deliveredCount">0</h3>
+                            <p>Delivered</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-heart"></i></div>
+                        <div class="stat-info">
+                            <h3 id="wishlistCount">0</h3>
+                            <p>Wishlist Items</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-info">
+                            <h3 id="totalSpent">PKR 0</h3>
+                            <p>Total Spent</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-clock"></i> Recent Orders</h3>
+                        <div class="order-list" id="recentOrdersList"></div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-heart"></i> Wishlist</h3>
+                        <div class="wishlist-preview" id="wishlistPreview"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="dashboard-section" id="orders">
+                <div class="card">
+                    <h3><i class="fas fa-shopping-bag"></i> Order History</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Products</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="buyerOrdersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wishlist Section -->
+            <section class="dashboard-section" id="wishlist">
+                <div class="card">
+                    <h3><i class="fas fa-heart"></i> My Wishlist</h3>
+                    <div class="product-grid" id="wishlistGrid"></div>
+                </div>
+            </section>
+
+            <!-- Addresses Section -->
+            <section class="dashboard-section" id="addresses">
+                <div class="card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Saved Addresses</h3>
+                    <div class="address-list" id="addressList">
+                        <!-- Saved addresses will be rendered here -->
+                    </div>
+                    <button class="btn btn-outline" onclick="showAddressForm()">
+                        <i class="fas fa-plus"></i> Add New Address
+                    </button>
+                    <div class="card address-form-card" id="addressFormCard" style="display:none; margin-top:1rem;">
+                        <h3><i class="fas fa-map-marker-alt"></i> Add / Edit Address</h3>
+                        <form class="product-form" onsubmit="saveAddress(event)">
+                            <input type="hidden" id="addressId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Label</label>
+                                    <input type="text" id="addressLabel" placeholder="Home, Office, Parents' House" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone</label>
+                                    <input type="tel" id="addressPhone" placeholder="+92 300 1234567" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Delivery Address</label>
+                                <textarea id="addressLine" rows="3" placeholder="Street address, building, landmark" required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" id="addressCity" placeholder="Karachi" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>State / Province</label>
+                                    <input type="text" id="addressRegion" placeholder="Sindh" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <input type="text" id="addressCountry" placeholder="Pakistan" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Postal Code</label>
+                                    <input type="text" id="addressPostal" placeholder="74500">
+                                </div>
+                            </div>
+                            <div class="form-row" style="justify-content:flex-end; gap:0.75rem;">
+                                <button type="button" class="btn btn-outline" onclick="hideAddressForm()">Cancel</button>
+                                <button type="submit" class="btn">Save Address</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section class="dashboard-section" id="profile">
+                <div class="card">
+                    <h3><i class="fas fa-user"></i> My Profile</h3>
+                    <form class="product-form" onsubmit="updateBuyerProfile(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="buyerProfileName">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="buyerProfileEmail" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="buyerProfilePhone">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" id="buyerProfileDob">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-auth">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Message</span>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

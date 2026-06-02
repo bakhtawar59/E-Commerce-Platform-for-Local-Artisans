@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - E-Commerce Platform for Local Artisans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-hands"></i>
+            <span class="logo-text">ArtisanCraft</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#home">Home</a></li>
+            <li><a href="index.html#categories">Categories</a></li>
+            <li><a href="shop.html" class="active">Shop</a></li>
+            <li><a href="index.html#features">Why Us</a></li>
+            <li><a href="index.html#testimonials">Reviews</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li class="cart-icon" onclick="toggleCart()">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </li>
+            <li id="authSection">
+                <a href="login.html" class="btn btn-small">Login / Register</a>
+            </li>
+        </ul>
+        <div class="mobile-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <section class="hero shop-hero" id="shopHero">
+        <div class="hero-content">
+            <h1>Discover Pakistani Artisan Treasures</h1>
+            <p>Browse our curated marketplace for handcrafted pottery, textiles, woodwork, and jewelry made by local artisans across Pakistan.</p>
+            <div>
+                <a href="#products" class="btn">Start Shopping</a>
+                <a href="#details" class="btn btn-outline">Why Shop With Us</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="products" id="products">
+        <h2 class="section-title scroll-reveal">Shop the Collection</h2>
+        <p class="section-subtitle scroll-reveal">Filter by category, search by artisan, and choose your perfect handmade item.</p>
+        <div class="product-controls scroll-reveal">
+            <input id="searchInput" type="text" placeholder="Search products, artisans, categories" oninput="applyProductFilters()">
+            <select id="sortSelect" onchange="applyProductFilters()">
+                <option value="default">Sort by</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+            </select>
+        </div>
+        <div class="filter-tabs scroll-reveal">
+            <button class="tab active" onclick="filterProducts('all')">All</button>
+            <button class="tab" onclick="filterProducts('pottery')">Pottery</button>
+            <button class="tab" onclick="filterProducts('textiles')">Textiles</button>
+            <button class="tab" onclick="filterProducts('woodwork')">Woodwork</button>
+            <button class="tab" onclick="filterProducts('jewelry')">Jewelry</button>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <section class="features" id="details">
+        <h2 class="section-title scroll-reveal">Shop Features</h2>
+        <p class="section-subtitle scroll-reveal">All the support, craft, and convenience for a confident purchase.</p>
+        <div class="features-grid">
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-truck-fast"></i></div>
+                <h3>Nationwide Delivery</h3>
+                <p>Fast and reliable shipping across Pakistan, with careful packaging for every handcrafted item.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Secure Checkout</h3>
+                <p>Easy order process with a trusted checkout experience and instant cart updates.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <h3>Support Local Artisans</h3>
+                <p>Every purchase empowers rural creators and preserves genuine Pakistani craft traditions.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-sync-alt"></i></div>
+                <h3>Easy Returns</h3>
+                <p>Simple return policy for peace of mind with every handmade gift or home accent.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-cta">
+        <div class="contact-cta-inner">
+            <h2>Need support or have a question?</h2>
+            <p>Visit our dedicated contact page to send us a message and get assistance from our support team.</p>
+            <a href="contact.html" class="btn">Contact Us</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>E-Commerce Platform</h3>
+                <p>Connecting talented local artisans with art lovers nationwide. Every purchase supports traditional craftsmanship and rural communities.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <a href="index.html#home">Home</a><br>
+                <a href="shop.html">Shop</a><br>
+                <a href="index.html#categories">Categories</a><br>
+                <a href="index.html#features">Why Us</a><br>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h3>Customer Service</h3>
+                <a href="#">Shipping Info</a><br>
+                <a href="#">Returns & Exchanges</a><br>
+                <a href="#">FAQ</a><br>
+                <a href="#">Track Order</a><br>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <p>Subscribe for exclusive offers and artisan stories.</p>
+                <form style="margin-top: 1rem;" onsubmit="event.preventDefault(); showToast('Subscribed successfully!')">
+                    <input type="email" placeholder="Your email" style="padding: 0.8rem; border-radius: 5px; border: none; width: 100%; margin-bottom: 0.5rem;">
+                    <button type="submit" class="btn" style="width: 100%;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 E-Commerce Platform for Local Artisans. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--secondary);"></i> for artisans.</p>
+        </div>
+    </footer>
+
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
+            <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">PKR 0.00</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">
+                <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="quickViewModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-img" id="modalImg"></div>
+            <div class="modal-details">
+                <h2 class="modal-title" id="modalTitle">Product Title</h2>
+                <div class="modal-price" id="modalPrice">PKR 0.00</div>
+                <p class="modal-desc" id="modalDesc">Description</p>
+                <div class="modal-actions">
+                    <button class="btn" onclick="addToCartFromModal()" style="flex: 1;">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-outline" onclick="closeModal()" style="flex: 1;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Added to cart!</span>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

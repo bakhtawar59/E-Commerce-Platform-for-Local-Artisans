@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - E-Commerce Platform for Local Artisans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-hands"></i>
+                <span>E-Commerce Platform</span>
+            </div>
+            
+            <div class="seller-info">
+                <div class="seller-avatar" id="sellerAvatar">S</div>
+                <div class="seller-details">
+                    <h4 id="sellerShopName">My Shop</h4>
+                    <span class="status-badge" id="sellerStatus">Pending</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('overview')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('addProduct')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('myProducts')">
+                    <i class="fas fa-box"></i>
+                    <span>My Products</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('orders')">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('profile')">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h2 id="pageTitle">Seller Dashboard</h2>
+                <div class="header-actions">
+                    <a href="../index.html" class="btn btn-small" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> View Store
+                    </a>
+                    <div class="user-menu">
+                        <span id="sellerName">Seller</span>
+                        <div class="avatar" id="headerAvatar">S</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section class="dashboard-section active" id="overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+                        <div class="stat-info">
+                            <h3 id="sellerProductCount">0</h3>
+                            <p>My Products</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3 id="approvedProductCount">0</h3>
+                            <p>Approved</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="pendingProductCount">0</h3>
+                            <p>Pending Approval</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-info">
+                            <h3 id="sellerRevenue">PKR 0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <div class="notification-list" id="sellerNotifications">
+                            <div class="notification-item">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <p>Welcome to our E-Commerce Platform! Complete your profile to get approved faster.</p>
+                                    <small>Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-lightbulb"></i> Seller Tips</h3>
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <i class="fas fa-camera"></i>
+                                <p>Use high-quality images for better sales</p>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-tag"></i>
+                                <p>Write detailed product descriptions</p>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-truck"></i>
+                                <p>Ship orders within 2 business days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Product Section -->
+            <section class="dashboard-section" id="addProduct">
+                <div class="card">
+                    <h3><i class="fas fa-plus-circle"></i> Add New Product</h3>
+                    <form class="product-form" onsubmit="handleAddProduct(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Product Name *</label>
+                                <input type="text" id="productName" placeholder="Enter product name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category *</label>
+                                <select id="productCategory" required>
+                                    <option value="">Select category</option>
+                                    <option value="pottery">Pottery & Ceramics</option>
+                                    <option value="textiles">Textiles & Weaving</option>
+                                    <option value="woodwork">Woodwork</option>
+                                    <option value="jewelry">Handmade Jewelry</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price (PKR) *</label>
+                                <input type="number" id="productPrice" placeholder="0" step="1" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock Quantity *</label>
+                                <input type="number" id="productStock" placeholder="0" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Product Description *</label>
+                            <textarea id="productDescription" rows="4" placeholder="Describe your product in detail..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Product Image URL</label>
+                            <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                            <small>Leave empty to use a default image</small>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-auth">
+                                <i class="fas fa-paper-plane"></i> Submit for Approval
+                            </button>
+                            <button type="reset" class="btn btn-outline">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- My Products Section -->
+            <section class="dashboard-section" id="myProducts">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-box"></i> My Products</h3>
+                        <div class="filter-tabs">
+                            <button class="tab active" onclick="filterMyProducts('all')">All</button>
+                            <button class="tab" onclick="filterMyProducts('pending')">Pending</button>
+                            <button class="tab" onclick="filterMyProducts('approved')">Approved</button>
+                            <button class="tab" onclick="filterMyProducts('rejected')">Rejected</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myProductsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="dashboard-section" id="orders">
+                <div class="card">
+                    <h3><i class="fas fa-shopping-cart"></i> My Orders</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Buyer</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sellerOrdersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section class="dashboard-section" id="profile">
+                <div class="card">
+                    <h3><i class="fas fa-user"></i> Seller Profile</h3>
+                    <form class="product-form" onsubmit="updateProfile(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Shop Name</label>
+                                <input type="text" id="profileShopName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Owner Name</label>
+                                <input type="text" id="profileName" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="profileEmail" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="profilePhone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Shop Description</label>
+                            <textarea id="profileBio" rows="3" placeholder="Tell customers about your shop..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-auth">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Message</span>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+
+</body>
+</html>

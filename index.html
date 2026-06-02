@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Platform for Local Artisans - Pakistani Handicrafts Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <i class="fas fa-hands"></i>
+            <span class="logo-text">ArtisanCraft</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#features">Why Us</a></li>
+            <li><a href="#testimonials">Reviews</a></li>
+            <li class="cart-icon" onclick="toggleCart()">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </li>
+            <li id="authSection">
+                <a href="login.html" class="btn btn-small">Login / Register</a>
+            </li>
+        </ul>
+        <div class="mobile-menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="floating-shapes">
+            <div class="shape" style="left: 10%; animation-delay: 0s;">🎨</div>
+            <div class="shape" style="left: 30%; animation-delay: 5s;">🏺</div>
+            <div class="shape" style="left: 50%; animation-delay: 10s;">🧵</div>
+            <div class="shape" style="left: 70%; animation-delay: 3s;">🪵</div>
+            <div class="shape" style="left: 90%; animation-delay: 7s;">🎭</div>
+        </div>
+        <div class="hero-content">
+            <h1>Authentic Pakistani Handicrafts, Delivered Nationwide</h1>
+            <p>Support local artisans from Punjab, Sindh, Khyber Pakhtunkhwa, and Balochistan. Every piece celebrates tradition, craft, and community.</p>
+            <div>
+                <a href="shop.html" class="btn">Explore Collection</a>
+                <a href="contact.html" class="btn btn-outline">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories" id="categories">
+        <h2 class="section-title scroll-reveal">Browse by Category</h2>
+        <p class="section-subtitle scroll-reveal">Explore traditional Pakistani crafts from authentic village workshops</p>
+        <div class="category-grid">
+            <div class="category-card scroll-reveal" onclick="filterProducts('pottery')">
+                <div class="category-img" style="background-image: url('https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <h3><i class="fas fa-wine-bottle"></i> Pottery & Ceramics</h3>
+            </div>
+            <div class="category-card scroll-reveal" onclick="filterProducts('textiles')">
+                <div class="category-img" style="background-image: url('https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <h3><i class="fas fa-tshirt"></i> Textiles & Weaving</h3>
+            </div>
+            <div class="category-card scroll-reveal" onclick="filterProducts('woodwork')">
+                <div class="category-img" style="background-image: url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <h3><i class="fas fa-tree"></i> Woodwork</h3>
+            </div>
+            <div class="category-card scroll-reveal" onclick="filterProducts('jewelry')">
+                <div class="category-img" style="background-image: url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                <h3><i class="fas fa-gem"></i> Handmade Jewelry</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="products" id="products">
+        <h2 class="section-title scroll-reveal">Featured Handicrafts</h2>
+        <p class="section-subtitle scroll-reveal">Curated selection of finest artisan works</p>
+        
+        <div class="product-controls scroll-reveal">
+            <input id="searchInput" type="text" placeholder="Search products, artisans, categories" oninput="applyProductFilters()">
+            <select id="sortSelect" onchange="applyProductFilters()">
+                <option value="default">Sort by</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+            </select>
+        </div>
+
+        <div class="filter-tabs scroll-reveal">
+            <button class="tab active" onclick="filterProducts('all')">All</button>
+            <button class="tab" onclick="filterProducts('pottery')">Pottery</button>
+            <button class="tab" onclick="filterProducts('textiles')">Textiles</button>
+            <button class="tab" onclick="filterProducts('woodwork')">Woodwork</button>
+            <button class="tab" onclick="filterProducts('jewelry')">Jewelry</button>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <h2 class="section-title scroll-reveal" style="color: white;">Why Choose Our Platform?</h2>
+        <div class="features-grid">
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <h3>100% Handmade</h3>
+                <p>Every item is crafted by skilled artisans using traditional techniques passed down through generations.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                <h3>Eco-Friendly</h3>
+                <p>Sustainable materials and environmentally conscious practices in every creation.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
+                <h3>Fast Delivery</h3>
+                <p>Carefully packaged and delivered to your doorstep within 3-5 business days.</p>
+            </div>
+            <div class="feature-item scroll-reveal">
+                <div class="feature-icon"><i class="fas fa-undo"></i></div>
+                <h3>Easy Returns</h3>
+                <p>Not satisfied? Return within 30 days for a full refund, no questions asked.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <h2 class="section-title scroll-reveal">What Our Customers Say</h2>
+        <div class="testimonial-slider">
+            <div class="testimonial-card active">
+                <p class="quote">"The pottery set I ordered exceeded my expectations. You can feel the care and tradition in every piece. It's not just a product, it's a piece of art that carries stories."</p>
+                <div class="testimonial-author">
+                    <div class="author-img">A</div>
+                    <div class="author-info">
+                        <div class="author-name">Ayesha Khan</div>
+                        <div class="author-role">Interior Designer</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="quote">"I've been collecting handmade textiles for years, and the quality here is unmatched. The attention to detail and authenticity is remarkable. Highly recommended!"</p>
+                <div class="testimonial-author">
+                    <div class="author-img">B</div>
+                    <div class="author-info">
+                        <div class="author-name">Bilal Shah</div>
+                        <div class="author-role">Art Collector</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="quote">"Supporting local artisans while getting beautiful home decor? Count me in! The wooden sculptures are stunning conversation starters in my living room."</p>
+                <div class="testimonial-author">
+                    <div class="author-img">M</div>
+                    <div class="author-info">
+                        <div class="author-name">Mehwish Ali</div>
+                        <div class="author-role">Homeowner</div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-dots">
+                <span class="dot active" onclick="showTestimonial(0)"></span>
+                <span class="dot" onclick="showTestimonial(1)"></span>
+                <span class="dot" onclick="showTestimonial(2)"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>E-Commerce Platform</h3>
+                <p>Connecting talented local artisans with art lovers nationwide. Every purchase supports traditional craftsmanship and rural communities.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a><br>
+                <a href="#products">Shop</a><br>
+                <a href="#categories">Categories</a><br>
+                <a href="#features">About Us</a><br>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h3>Customer Service</h3>
+                <a href="#">Shipping Info</a><br>
+                <a href="#">Returns & Exchanges</a><br>
+                <a href="#">FAQ</a><br>
+                <a href="#">Track Order</a><br>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <p>Subscribe for exclusive offers and artisan stories.</p>
+                <form style="margin-top: 1rem;" onsubmit="event.preventDefault(); showToast('Subscribed successfully!')">
+                    <input type="email" placeholder="Your email" style="padding: 0.8rem; border-radius: 5px; border: none; width: 100%; margin-bottom: 0.5rem;">
+                    <button type="submit" class="btn" style="width: 100%;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 E-Commerce Platform for Local Artisans. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--secondary);"></i> for artisans.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
+            <button class="close-cart" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically inserted -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">PKR 0.00</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">
+                <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="modal" id="quickViewModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-img" id="modalImg"></div>
+            <div class="modal-details">
+                <h2 class="modal-title" id="modalTitle">Product Title</h2>
+                <div class="modal-price" id="modalPrice">PKR 0.00</div>
+                <p class="modal-desc" id="modalDesc">Description</p>
+                <div class="modal-actions">
+                    <button class="btn" onclick="addToCartFromModal()" style="flex: 1;">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="btn btn-outline" onclick="closeModal()" style="flex: 1;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Added to cart!</span>
+    </div>
+
+    <script type="text/template">
+        // Product Data
+        const products = [
+            {
+                id: 1,
+                title: "Hand-Painted Ceramic Vase",
+                artisan: "Maria Gonzalez",
+                price: 89.99,
+                category: "pottery",
+                image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.8,
+                badge: "Bestseller",
+                description: "A stunning hand-painted ceramic vase featuring traditional floral motifs. Each piece is unique, crafted using ancient pottery techniques and fired in a wood-burning kiln for 48 hours."
+            },
+            {
+                id: 2,
+                title: "Woven Wall Tapestry",
+                artisan: "Aisha Patel",
+                price: 145.00,
+                category: "textiles",
+                image: "https://images.unsplash.com/photo-1528578577235-b963df6db908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.9,
+                badge: "New",
+                description: "Intricately woven wall tapestry using organic cotton and natural dyes. This piece takes over 2 weeks to complete and features geometric patterns inspired by traditional tribal art."
+            },
+            {
+                id: 3,
+                title: "Carved Walnut Bowl",
+                artisan: "John Miller",
+                price: 67.50,
+                category: "woodwork",
+                image: "https://images.unsplash.com/photo-1603653856395-084009e58a42?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.7,
+                badge: null,
+                description: "Hand-carved from sustainably sourced black walnut, this bowl showcases the natural grain patterns of the wood. Food-safe finish using organic beeswax and mineral oil."
+            },
+            {
+                id: 4,
+                title: "Silver Tribal Earrings",
+                artisan: "Rosa Martinez",
+                price: 45.00,
+                category: "jewelry",
+                image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.6,
+                badge: "Popular",
+                description: "Sterling silver earrings with intricate tribal patterns hand-stamped by skilled silversmiths. Each pair is oxidized to enhance the detailed designs and polished to a mirror finish."
+            },
+            {
+                id: 5,
+                title: "Embroidered Throw Pillow",
+                artisan: "Li Wei",
+                price: 55.00,
+                category: "textiles",
+                image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.8,
+                badge: null,
+                description: "Luxurious linen throw pillow featuring hand-embroidered silk thread patterns. The design draws inspiration from ancient silk road motifs, bringing history into your home."
+            },
+            {
+                id: 6,
+                title: "Rustic Clay Planter",
+                artisan: "Tom Bradley",
+                price: 34.99,
+                category: "pottery",
+                image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.5,
+                badge: "Sale",
+                description: "Rustic terracotta planter with a natural, unglazed finish. Perfect for succulents and small plants. The porous clay allows roots to breathe and prevents overwatering."
+            },
+            {
+                id: 7,
+                title: "Handcrafted Bamboo Lamp",
+                artisan: "Chen Yu",
+                price: 120.00,
+                category: "woodwork",
+                image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.9,
+                badge: "Eco-Friendly",
+                description: "Sustainable bamboo table lamp with hand-woven shade. The warm light creates beautiful shadow patterns, perfect for creating a cozy atmosphere in any room."
+            },
+            {
+                id: 8,
+                title: "Beaded Statement Necklace",
+                artisan: "Amara Okafor",
+                price: 78.00,
+                category: "jewelry",
+                image: "https://images.unsplash.com/photo-1599643478518-17488fbbcd75?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                rating: 4.7,
+                badge: null,
+                description: "Bold statement necklace featuring hand-strung glass beads in vibrant traditional colors. Each bead is carefully selected to create a harmonious, eye-catching design."
+            }
+        ];
+
+        let cart = [];
+        let currentModalProduct = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts('all');
+            setupScrollReveal();
+            setupNavbar();
+        });
+
+        // Render Products
+        function renderProducts(category) {
+            const grid = document.getElementById('productGrid');
+            const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+            
+            grid.innerHTML = filtered.map(product => `
+                <div class="product-card scroll-reveal">
+                    <div class="product-img" style="background-image: url('${product.image}')">
+                        ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
+                        <div class="product-actions">
+                            <button class="action-btn" onclick="quickView(${product.id})" title="Quick View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" onclick="addToCart(${product.id})" title="Add to Cart">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                            <button class="action-btn" onclick="showToast('Added to wishlist!')" title="Wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.title}</h3>
+                        <p class="product-artisan"><i class="fas fa-user"></i> ${product.artisan}</p>
+                        <div class="product-price">
+                            <span class="price">PKR ${product.price.toFixed(2)}</span>
+                            <span class="rating">
+                                ${Array(5).fill(0).map((_, i) => 
+                                    `<i class="fas fa-star${i < Math.floor(product.rating) ? '' : '-half-alt'}"></i>`
+                                ).join('')}
+                                ${product.rating}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Re-trigger scroll reveal for new elements
+            setTimeout(() => {
+                document.querySelectorAll('.product-card').forEach(el => {
+                    el.classList.add('active');
+                });
+            }, 100);
+        }
+
+        // Filter Products
+        function filterProducts(category) {
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(category) || (category === 'all' && tab.textContent === 'All')) {
+                    tab.classList.add('active');
+                }
+            });
+
+            renderProducts(category);
+            
+            // Scroll to products if coming from category click
+            if (window.scrollY < document.getElementById('products').offsetTop - 100) {
+                document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Quick View
+        function quickView(id) {
+            const product = products.find(p => p.id === id);
+            currentModalProduct = product;
+            
+            document.getElementById('modalImg').style.backgroundImage = `url('${product.image}')`;
+            document.getElementById('modalTitle').textContent = product.title;
+            document.getElementById('modalPrice').textContent = `PKR ${product.price.toFixed(2)}`;
+            document.getElementById('modalDesc').textContent = product.description;
+            
+            document.getElementById('quickViewModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('quickViewModal').classList.remove('active');
+        }
+
+        function addToCartFromModal() {
+            if (currentModalProduct) {
+                addToCart(currentModalProduct.id);
+                closeModal();
+            }
+        }
+
+        // Cart Functions
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCart();
+            showToast(`${product.title} added to cart!`);
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = `PKR ${totalPrice.toFixed(2)}`;
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-light);">
+                        <i class="fas fa-shopping-bag" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                        <p>Your cart is empty</p>
+                        <a href="#products" class="btn" style="margin-top: 1rem;" onclick="toggleCart()">Start Shopping</a>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-img" style="background-image: url('${item.image}')"></div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.title}</div>
+                            <div class="cart-item-price">PKR ${item.price.toFixed(2)}</div>
+                            <div class="quantity-control">
+                                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                            </div>
+                            <span class="remove-item" onclick="removeFromCart(${item.id})">
+                                <i class="fas fa-trash"></i> Remove
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleCart() {
+            document.getElementById('cartSidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Your cart is empty!');
+                return;
+            }
+            showToast('Proceeding to checkout...');
+            setTimeout(() => {
+                alert('Thank you for your order! This is a demo checkout.');
+                cart = [];
+                updateCart();
+                toggleCart();
+            }, 1500);
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Testimonial Slider
+        let currentTestimonial = 0;
+        const testimonials = document.querySelectorAll('.testimonial-card');
+        const dots = document.querySelectorAll('.dot');
+
+        function showTestimonial(index) {
+            testimonials.forEach(t => t.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            
+            testimonials[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentTestimonial = index;
+        }
+
+        // Auto-advance testimonials
+        setInterval(() => {
+            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+            showTestimonial(currentTestimonial);
+        }, 5000);
+
+        // Scroll Reveal Animation
+        function setupScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Navbar Scroll Effect
+        function setupNavbar() {
+            const navbar = document.getElementById('navbar');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 100) {
+                    navbar.style.boxShadow = '0 2px 20px rgba(139, 69, 19, 0.15)';
+                } else {
+                    navbar.style.boxShadow = '0 2px 20px var(--shadow)';
+                }
+                
+                lastScroll = currentScroll;
+            });
+        }
+
+        // Mobile Menu
+        function toggleMobileMenu() {
+            // Simple mobile menu toggle - in production, you'd expand this
+            document.querySelector('.nav-links').classList.toggle('mobile-active');
+        }
+
+        // Smooth Scroll for Navigation Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                if (document.getElementById('cartSidebar').classList.contains('open')) {
+                    toggleCart();
+                }
+            }
+        });
+    </script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

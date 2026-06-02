@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - E-Commerce Platform for Local Artisans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="auth-brand">
+                <i class="fas fa-hands"></i>
+                <h1><i class="fas fa-hands"></i> ArtisanCraft</h1>
+                <p>Join our community of artisans and art lovers</p>
+            </div>
+            <div class="auth-features">
+                <div class="feature">
+                    <i class="fas fa-store"></i>
+                    <span>Sell your handmade crafts</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Discover unique treasures</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure transactions</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="auth-right">
+            <!-- Login Form -->
+            <div class="auth-form" id="loginForm">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="password-input">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('loginPassword', this)"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember">
+                            <input type="checkbox"> Remember me
+                        </label>
+                        <a href="#" class="forgot">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-auth">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                
+                <div class="role-selector">
+                    <p>Don't have an account? Register as:</p>
+                    <div class="role-buttons">
+                        <button class="btn btn-role buyer" onclick="showRegister('buyer')">
+                            <i class="fas fa-shopping-bag"></i> Buyer
+                        </button>
+                        <button class="btn btn-role seller" onclick="showRegister('seller')">
+                            <i class="fas fa-store"></i> Seller
+                        </button>
+                    </div>
+                </div>
+                
+                <a href="index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="auth-form hidden" id="registerForm">
+                <h2>Create Account</h2>
+                <p id="registerSubtitle">Register as a Buyer</p>
+                
+                <form onsubmit="handleRegister(event)">
+                    <input type="hidden" id="registerRole" value="buyer">
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="regName" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="regEmail" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group" id="shopNameGroup" style="display: none;">
+                        <label><i class="fas fa-store"></i> Shop Name</label>
+                        <input type="text" id="regShopName" placeholder="Enter your shop name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Phone Number</label>
+                        <input type="tel" id="regPhone" placeholder="Enter your phone number" required>
+                    </div>
+
+                    <div class="address-fields" id="addressFieldsGroup">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Address Label</label>
+                            <input type="text" id="regAddressLabel" placeholder="Home, Office, Parents' House" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-road"></i> Street / Landmark</label>
+                            <input type="text" id="regAddressLine" placeholder="Street, building, landmark" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" id="regAddressCity" placeholder="Karachi" required>
+                            </div>
+                            <div class="form-group">
+                                <label>State / Province</label>
+                                <input type="text" id="regAddressRegion" placeholder="Sindh" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" id="regAddressCountry" placeholder="Pakistan" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Postal Code</label>
+                                <input type="text" id="regAddressPostal" placeholder="74500" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="password-input">
+                            <input type="password" id="regPassword" placeholder="Create a password" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('regPassword', this)"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-auth">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+                
+                <p class="switch-auth">
+                    Already have an account? 
+                    <a href="#" onclick="showLogin()">Sign In</a>
+                </p>
+                
+                <a href="index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Message</span>
+    </div>
+
+    <script src="js/auth.js"></script>
+
+</body>
+</html>
