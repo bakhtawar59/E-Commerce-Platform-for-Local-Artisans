@@ -96,10 +96,31 @@
                         </div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-icon teal"><i class="fas fa-coins"></i></div>
+                        <div class="stat-info">
+                            <h3 id="sellerGrossEarnings">PKR 0</h3>
+                            <p>Total Earnings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
                         <div class="stat-info">
                             <h3 id="sellerRevenue">PKR 0</h3>
-                            <p>Total Revenue</p>
+                            <p>Net Revenue</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-info">
+                            <h3 id="sellerPendingEarnings">PKR 0</h3>
+                            <p>Pending Earnings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fas fa-percentage"></i></div>
+                        <div class="stat-info">
+                            <h3 id="sellerTotalCommission">PKR 0</h3>
+                            <p>Total Commission</p>
                         </div>
                     </div>
                 </div>
@@ -239,6 +260,7 @@
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="sellerOrdersTableBody"></tbody>
@@ -255,11 +277,11 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Shop Name</label>
-                                <input type="text" id="profileShopName" readonly>
+                                <input type="text" id="profileShopName">
                             </div>
                             <div class="form-group">
                                 <label>Owner Name</label>
-                                <input type="text" id="profileName" readonly>
+                                <input type="text" id="profileName">
                             </div>
                         </div>
                         <div class="form-row">

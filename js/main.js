@@ -1,5 +1,6 @@
 // ==================== PRODUCT DATA ====================
 const currencySymbol = 'PKR';
+const COMMISSION_RATE = 0.10;
 
 const defaultProducts = [
     {
@@ -144,14 +145,14 @@ function saveWishlist(wishlist) {
 }
 
 function toggleWishlist(id) {
-    const product = products.find(p => p.id === id);
+    const product = products.find(p => String(p.id) === String(id));
     if (!product) return showToast('Product not found');
 
     let wishlist = getWishlist();
-    const exists = wishlist.find(item => item.id === id);
+    const exists = wishlist.find(item => String(item.id) === String(id));
 
     if (exists) {
-        wishlist = wishlist.filter(item => item.id !== id);
+        wishlist = wishlist.filter(item => String(item.id) !== String(id));
         showToast('Removed from wishlist.');
     } else {
         wishlist.push(product);
@@ -159,6 +160,10 @@ function toggleWishlist(id) {
     }
 
     saveWishlist(wishlist);
+    // If buyer dashboard is open, refresh its wishlist UI
+    try { if (typeof loadBuyerWishlist === 'function') loadBuyerWishlist(); } catch (e) {}
+    const countEl = document.getElementById('wishlistCount');
+    if (countEl) countEl.textContent = String(wishlist.length);
 }
 
 function applyProductFilters() {
@@ -308,6 +313,8 @@ function renderProducts(category) {
     const grid = document.getElementById('productGrid');
     currentCategory = category;
 
+    const wishlist = getWishlist();
+
     let filtered = category === 'all' ? products : products.filter(p => p.category === category);
     filtered = filtered.filter(p => !p.status || p.status === 'approved' || p.status === 'sold-out');
     if (searchQuery) {
@@ -338,25 +345,25 @@ function renderProducts(category) {
                 ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
                 ${product.stock === 0 ? '<span class="sold-out-badge">Sold Out</span>' : ''}
                 <div class="product-actions">
-                    <button class="action-btn" onclick="quickView(${product.id})" title="Quick View">
+                    <button class="action-btn" onclick="quickView('${product.id}')" title="Quick View">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn ${product.stock === 0 ? 'disabled' : ''}" ${product.stock === 0 ? 'disabled title="Sold out"' : `onclick="addToCart(${product.id})" title="Add to Cart"`}>
+                    <button class="action-btn ${product.stock === 0 ? 'disabled' : ''}" ${product.stock === 0 ? 'disabled title="Sold out"' : `onclick="addToCart('${product.id}')" title="Add to Cart"`}>
                         <i class="fas fa-shopping-cart"></i>
                     </button>
-                    <button class="action-btn" onclick="toggleWishlist(${product.id})" title="Wishlist">
+                    <button class="action-btn ${wishlist.find(w => String(w.id) === String(product.id)) ? 'active' : ''}" onclick="toggleWishlist('${product.id}')" title="Wishlist">
                         <i class="fas fa-heart"></i>
                     </button>
                 </div>
             </div>
             <div class="product-info">
                 <h3 class="product-title">${product.title || product.name}</h3>
-                <p class="product-artisan"><i class="fas fa-user"></i> ${product.artisan}</p>
+                <p class="product-artisan"><i class="fas fa-user"></i> ${product.artisan || product.sellerName || 'Unknown Seller'}</p>
                 <div class="product-price">
                     <span class="price">${formatCurrency(product.price)}</span>
                     <span class="rating">
                         ${generateStars(product.rating)}
-                        ${product.rating}
+                        ${product.rating || 0}
                     </span>
                 </div>
                 <div class="product-stock">${product.stock === 0 ? 'Sold out' : `${product.stock} item${product.stock === 1 ? '' : 's'} left`}</div>
@@ -372,11 +379,12 @@ function renderProducts(category) {
 }
 
 function generateStars(rating) {
+    const score = Number(rating) || 0;
     let stars = '';
     for (let i = 0; i < 5; i++) {
-        if (i < Math.floor(rating)) {
+        if (i < Math.floor(score)) {
             stars += '<i class="fas fa-star"></i>';
-        } else if (i < rating) {
+        } else if (i < score) {
             stars += '<i class="fas fa-star-half-alt"></i>';
         } else {
             stars += '<i class="far fa-star"></i>';
@@ -404,12 +412,13 @@ function filterProducts(category) {
 
 // ==================== QUICK VIEW MODAL ====================
 function quickView(id) {
-    const product = products.find(p => p.id === id);
+    const product = products.find(p => String(p.id) === String(id));
+    if (!product) return showToast('Product not found', 'error');
     currentModalProduct = product;
     
     document.getElementById('modalImg').style.backgroundImage = `url('${product.image}')`;
     document.getElementById('modalTitle').textContent = product.title || product.name;
-document.getElementById('modalPrice').textContent = formatCurrency(product.price);
+    document.getElementById('modalPrice').textContent = formatCurrency(product.price);
     document.getElementById('modalDesc').textContent = product.description;
     
     document.getElementById('quickViewModal').classList.add('active');
@@ -445,11 +454,11 @@ function addToCartFromModal() {
 
 // ==================== CART FUNCTIONALITY ====================
 function addToCart(id) {
-    const product = products.find(p => p.id === id);
+    const product = products.find(p => String(p.id) === String(id));
     if (!product) return showToast('Product not found', 'error');
     if (product.stock === 0) return showToast('This product is sold out', 'error');
 
-    const existingItem = cart.find(item => item.id === id);
+    const existingItem = cart.find(item => String(item.id) === String(id));
     if (existingItem) {
         if (existingItem.quantity >= product.stock) {
             return showToast('No more stock available for this product', 'error');
@@ -464,12 +473,12 @@ function addToCart(id) {
 }
 
 function removeFromCart(id) {
-    cart = cart.filter(item => item.id !== id);
+    cart = cart.filter(item => String(item.id) !== String(id));
     updateCart();
 }
 
 function updateQuantity(id, change) {
-    const item = cart.find(item => item.id === id);
+    const item = cart.find(item => String(item.id) === String(id));
     if (item) {
         item.quantity += change;
         if (item.quantity <= 0) {
@@ -507,11 +516,11 @@ function updateCart() {
                     <div class="cart-item-title">${item.title || item.name}</div>
                     <div class="cart-item-price">${formatCurrency(item.price)}</div>
                     <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <button class="qty-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
                         <span>${item.quantity}</span>
-                        <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        <button class="qty-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
                     </div>
-                    <span class="remove-item" onclick="removeFromCart(${item.id})">
+                    <span class="remove-item" onclick="removeFromCart('${item.id}')">
                         <i class="fas fa-trash"></i> Remove
                     </span>
                 </div>
@@ -553,179 +562,84 @@ function checkout() {
 
 // ==================== PAYMENT INTEGRATION ====================
 function showPaymentModal() {
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // Group cart items by seller (use sellerId if available, fallback to sellerName)
+    const groups = {};
+    cart.forEach(item => {
+        const key = item.sellerId != null ? `seller_${item.sellerId}` : `seller_${(item.sellerName || item.artisan || 'unknown').replace(/\s+/g, '_')}`;
+        if (!groups[key]) {
+            groups[key] = {
+                key,
+                sellerId: item.sellerId || null,
+                sellerName: item.sellerName || item.artisan || 'Seller',
+                items: []
+            };
+        }
+        groups[key].items.push(item);
+    });
+
     const buyerAddresses = getBuyerAddresses();
     const defaultAddressText = buyerAddresses.length ? formatAddressForCheckout(buyerAddresses[0]) : '';
-    const addressSelectHtml = buyerAddresses.length ? `
-                <div class="form-group">
-                    <label>Choose saved delivery address</label>
-                    <select id="codAddressSelect" onchange="syncCodAddressSelect()">
-                        ${buyerAddresses.map(address => `
-                            <option value="${address.id}">${address.label} — ${address.city}, ${address.region}</option>
-                        `).join('')}
-                        <option value="custom">Use a different address</option>
-                    </select>
-                </div>
-    ` : '';
-    
-    // Create payment modal
+
     const paymentModal = document.createElement('div');
     paymentModal.id = 'paymentModal';
     paymentModal.className = 'payment-modal';
+
+    // Build a simpler seller-selection UI (reverts to single-selection flow)
+    const groupEntries = Object.values(groups).map(g => {
+        const subtotal = g.items.reduce((s, it) => s + ((it.price || 0) * (it.quantity || it.qty || 1)), 0);
+        const safeKey = g.key.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const itemsHtml = g.items.map(it => `<div class="group-item"><strong>${it.title || it.name}</strong> x${it.quantity || it.qty || 1} — ${formatCurrency((it.price||0))}</div>`).join('');
+        return `
+            <div class="seller-select" id="select_${safeKey}">
+                <label>
+                    <input type="radio" name="selectedSeller" value="${safeKey}" onchange="selectSellerRadio('${safeKey}')" ${Object.values(groups)[0] === g ? 'checked' : ''}>
+                    <strong>${g.sellerName}</strong> — ${formatCurrency(subtotal)}
+                </label>
+                <div class="seller-items">${itemsHtml}</div>
+                <div class="group-payment" id="group_payment_${safeKey}" style="display:none"></div>
+            </div>
+        `;
+    }).join('');
+
     paymentModal.innerHTML = `
-        <div class="payment-content">
+        <div class="payment-content single">
             <button class="payment-close" onclick="closePaymentModal()">×</button>
-            
-            <h2>Secure Payment</h2>
-            <p class="payment-subtitle">Choose your payment method</p>
-            
-            <div class="payment-amount">
-                <span>Total Amount:</span>
-                <span class="amount-value">${currencySymbol} ${cartTotal.toLocaleString('en-PK', {minimumFractionDigits: 2})}</span>
+            <h2>Checkout — Select a Seller</h2>
+            <p class="payment-subtitle">Your cart contains items from multiple sellers. Select one seller to purchase now; repeat for other sellers later.</p>
+            <div class="seller-list">
+                ${groupEntries}
             </div>
-            
-            <div class="payment-methods">
-                <!-- Card Payment -->
-                <div class="payment-method" onclick="selectPaymentMethod('card')">
-                    <input type="radio" name="payment" value="card" id="card-method">
-                    <label for="card-method" class="method-label">
-                        <i class="fas fa-credit-card"></i>
-                        <span>Credit/Debit Card</span>
-                    </label>
-                </div>
-                
-                <!-- EasyPaisa -->
-                <div class="payment-method" onclick="selectPaymentMethod('easypaisa')">
-                    <input type="radio" name="payment" value="easypaisa" id="easypaisa-method">
-                    <label for="easypaisa-method" class="method-label">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>EasyPaisa</span>
-                    </label>
-                </div>
-                
-                <!-- Bank Transfer -->
-                <div class="payment-method" onclick="selectPaymentMethod('bank')">
-                    <input type="radio" name="payment" value="bank" id="bank-method">
-                    <label for="bank-method" class="method-label">
-                        <i class="fas fa-university"></i>
-                        <span>Bank Transfer</span>
-                    </label>
-                </div>
-                
-                <!-- COD -->
-                <div class="payment-method" onclick="selectPaymentMethod('cod')">
-                    <input type="radio" name="payment" value="cod" id="cod-method">
-                    <label for="cod-method" class="method-label">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Cash on Delivery</span>
-                    </label>
-                </div>
+            <div class="seller-actions" style="margin-top:1rem;">
+                <button class="btn" onclick="proceedToSellerPayment()">Proceed to Payment for Selected Seller</button>
             </div>
-            
-            <!-- Card Form (Hidden by default) -->
-            <div id="cardForm" class="payment-form" style="display: none;">
-                <h3>Card Details</h3>
-                <p class="test-note">🔒 This is a demo payment. Use test card: <strong>4242 4242 4242 4242</strong></p>
-                <form onsubmit="processCardPayment(event)">
-                    <div class="form-group">
-                        <label>Card Number</label>
-                        <input type="text" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNumber" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>MM/YY</label>
-                            <input type="text" placeholder="12/25" maxlength="5" id="cardExpiry" required>
-                        </div>
-                        <div class="form-group">
-                            <label>CVC</label>
-                            <input type="text" placeholder="123" maxlength="3" id="cardCVC" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Cardholder Name</label>
-                        <input type="text" placeholder="Full Name" id="cardName" required>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
-                        Pay ${currencySymbol} ${cartTotal.toLocaleString('en-PK', {minimumFractionDigits: 2})}
-                    </button>
-                </form>
-            </div>
-            
-            <!-- EasyPaisa Form (Hidden by default) -->
-            <div id="easypaisaForm" class="payment-form" style="display: none;">
-                <h3>EasyPaisa Payment</h3>
-                <p class="test-note">📱 Demo EasyPaisa Payment</p>
-                <form onsubmit="processEasyPaisaPayment(event)">
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" placeholder="300XXXXXXXX" maxlength="12" id="easypaisaPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label>EasyPaisa PIN</label>
-                        <input type="password" placeholder="5-digit PIN" maxlength="5" id="easypaisaPIN" required>
-                    </div>
-                    <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;">
-                        <strong>Demo PIN:</strong> 12345
-                    </p>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
-                        Confirm Payment - ${currencySymbol} ${cartTotal.toLocaleString('en-PK', {minimumFractionDigits: 2})}
-                    </button>
-                </form>
-            </div>
-            
-            <!-- Bank Transfer Form (Hidden by default) -->
-            <div id="bankForm" class="payment-form" style="display: none;">
-                <h3>Bank Transfer Details</h3>
-                <div class="bank-details">
-                    <p><strong>Bank Name:</strong> Allied Bank Limited</p>
-                    <p><strong>Account Title:</strong> ArtisanCraft PK</p>
-                    <p><strong>Account Number:</strong> 24110072649001</p>
-                    <p><strong>IBAN:</strong> PK72ABFL0024110072649001</p>
-                    <p><strong>Amount:</strong> ${currencySymbol} ${cartTotal.toLocaleString('en-PK', {minimumFractionDigits: 2})}</p>
-                </div>
-                <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
-                    <i class="fas fa-info-circle"></i> Please enter the amount you're transferring below to confirm.
-                </p>
-                <form onsubmit="processBankPayment(event)">
-                    <div class="form-group">
-                        <label>Transfer Reference/TRX ID</label>
-                        <input type="text" placeholder="Enter transfer reference number" id="bankRef" required>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
-                        Confirm Bank Transfer
-                    </button>
-                </form>
-            </div>
-            
-            <!-- COD Form (Hidden by default) -->
-            <div id="codForm" class="payment-form" style="display: none;">
-                <h3>Cash on Delivery</h3>
-                <div class="cod-info">
-                    <p><i class="fas fa-check-circle"></i> Pay when you receive your order</p>
-                    <p><strong>Amount to Pay:</strong> ${currencySymbol} ${cartTotal.toLocaleString('en-PK', {minimumFractionDigits: 2})}</p>
-                    <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;">
-                        Delivery will take 3-5 business days. Our courier will contact you for delivery confirmation.
-                    </p>
-                </div>
-                <form onsubmit="processCODPayment(event)">
-                    ${addressSelectHtml}
-                    <div class="form-group">
-                        <label>Delivery Address</label>
-                        <textarea id="codAddress" placeholder="Enter delivery street address, landmark or area" rows="2" required>${defaultAddressText}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Delivery Instructions</label>
-                        <textarea id="codInstructions" placeholder="Enter special instructions for delivery (gate code, preferred delivery time, contact notes)" rows="3" required></textarea>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
-                        Confirm Cash on Delivery
-                    </button>
-                </form>
-            </div>
+            <div style="margin-top:1rem; font-size:0.9rem; color:#666;">After you complete payment for a seller, their items will be checked out and removed from your cart.</div>
         </div>
     `;
-    
+
     document.body.appendChild(paymentModal);
+    // auto-open the initially selected seller's payment options
+    setTimeout(() => {
+        const sel = document.querySelector('input[name="selectedSeller"]:checked');
+        if (sel) selectSellerRadio(sel.value);
+    }, 80);
+}
+
+function closeAllGroupPayments() {
+    document.querySelectorAll('.group-payment').forEach(el => {
+        try { el.style.display = 'none'; } catch (e) {}
+    });
+}
+
+function selectSellerRadio(safeKey) {
+    // close other open group payments
+    closeAllGroupPayments();
+    // open the requested seller's payment options
+    openGroupPayment(safeKey);
+    // ensure the selected radio remains checked
+    try {
+        const r = document.querySelector(`input[name="selectedSeller"][value="${safeKey}"]`);
+        if (r) r.checked = true;
+    } catch (e) {}
 }
 
 function selectPaymentMethod(method) {
@@ -811,16 +725,35 @@ function completeOrder(paymentMethod, paymentRef, deliveryInstruction = '', deli
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const orders = JSON.parse(localStorage.getItem('orders')) || [];
     
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+    const orderItems = cart.map(item => {
+        const quantity = item.quantity || item.qty || 1;
+        const itemTotal = (item.price || 0) * quantity;
+        const itemCommission = +(itemTotal * COMMISSION_RATE).toFixed(2);
+        const sellerPayout = +(itemTotal - itemCommission).toFixed(2);
+        return {
+            ...item,
+            quantity,
+            itemTotal,
+            platformCommission: itemCommission,
+            sellerPayout,
+            commissionRate: COMMISSION_RATE
+        };
+    });
+
+    const orderTotal = orderItems.reduce((sum, item) => sum + (item.itemTotal || 0), 0);
+    const orderCommission = orderItems.reduce((sum, item) => sum + (item.platformCommission || 0), 0);
+    const orderSellerPayout = +(orderTotal - orderCommission).toFixed(2);
+
     const order = {
         id: 'ord_' + Date.now(),
         buyerId: currentUser.id,
         buyerName: currentUser.name,
         buyerEmail: currentUser.email,
         buyerPhone: currentUser.phone || '',
-        items: [...cart],
-        total: cartTotal,
+        items: orderItems,
+        total: orderTotal,
+        platformCommission: orderCommission,
+        sellerPayout: orderSellerPayout,
         status: 'pending',
         paymentMethod: paymentMethod,
         paymentRef: paymentRef,
@@ -966,4 +899,298 @@ function toggleMobileMenu() {
     
     navLinks.classList.toggle('active');
     mobileMenu.classList.toggle('active');
+}
+
+// Open payment UI for a specific seller group
+function openGroupPayment(safeKey) {
+    const container = document.getElementById(`group_payment_${safeKey}`);
+    if (!container) return;
+    if (container.innerHTML.trim()) {
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        return;
+    }
+
+    // Find group by safeKey from cart
+    const groups = {};
+    cart.forEach(item => {
+        const key = item.sellerId != null ? `seller_${item.sellerId}` : `seller_${(item.sellerName || item.artisan || 'unknown').replace(/\s+/g, '_')}`;
+        if (!groups[key]) groups[key] = { key, items: [], sellerName: item.sellerName || item.artisan || 'Seller' };
+        groups[key].items.push(item);
+    });
+    const group = Object.values(groups).find(g => g.key.replace(/[^a-zA-Z0-9_-]/g, '_') === safeKey);
+    if (!group) return;
+
+    const subtotal = group.items.reduce((s, it) => s + ((it.price||0) * (it.quantity || it.qty || 1)), 0);
+    const addressSelectHtml = (() => {
+        const buyerAddresses = getBuyerAddresses();
+        if (!buyerAddresses.length) return '';
+        return `
+            <div class="form-group">
+                <label>Choose saved delivery address</label>
+                <select id="codAddressSelect_${safeKey}" onchange="syncCodAddressSelectFor('${safeKey}')">
+                    ${buyerAddresses.map(address => `<option value="${address.id}">${address.label} — ${address.city}, ${address.region}</option>`).join('')}
+                    <option value="custom">Use a different address</option>
+                </select>
+            </div>
+        `;
+    })();
+
+    container.innerHTML = `
+        <div class="payment-methods-group">
+            <div class="payment-amount">
+                <div>Total Amount:</div>
+                <div class="amount-value">${formatCurrency(subtotal)}</div>
+            </div>
+            <div class="payment-method-quick" id="methods_${safeKey}">
+                <button class="btn method-tile" data-method="card" onclick="selectGroupPaymentMethod('${safeKey}','card')"><i class="fas fa-credit-card"></i><span>Credit/Debit Card</span></button>
+                <button class="btn method-tile" data-method="easypaisa" onclick="selectGroupPaymentMethod('${safeKey}','easypaisa')"><i class="fas fa-mobile-alt"></i><span>EasyPaisa</span></button>
+                <button class="btn method-tile" data-method="bank" onclick="selectGroupPaymentMethod('${safeKey}','bank')"><i class="fas fa-university"></i><span>Bank Transfer</span></button>
+                <button class="btn method-tile" data-method="cod" onclick="selectGroupPaymentMethod('${safeKey}','cod')"><i class="fas fa-money-bill-wave"></i><span>Cash on Delivery</span></button>
+            </div>
+
+            <form id="cardForm_${safeKey}" class="group-form" style="display:none" onsubmit="processGroupedPayment('${safeKey}','card', event)">
+                <div class="method-details"><strong>Credit / Debit Card</strong><div>Enter your card details to pay securely. Test cards accepted.</div></div>
+                <div class="form-group"><label>Cardholder Name</label><input id="cardName_${safeKey}" required></div>
+                <div class="form-group"><label>Card Number</label><input id="cardNumber_${safeKey}" required placeholder="4242 4242 4242 4242"></div>
+                <div class="form-row"><div class="form-group"><label>Expiry</label><input id="cardExpiry_${safeKey}" required placeholder="MM/YY"></div><div class="form-group"><label>CVC</label><input id="cardCVC_${safeKey}" required placeholder="123"></div></div>
+                <div style="margin-top:.6rem"><button class="btn" type="submit">Pay ${formatCurrency(subtotal)} by Card</button></div>
+            </form>
+
+            <form id="easypaisaForm_${safeKey}" class="group-form" style="display:none" onsubmit="processGroupedPayment('${safeKey}','easypaisa', event)">
+                <div class="method-details"><strong>EasyPaisa</strong><div>Pay quickly with EasyPaisa mobile wallet. PIN: 12345 (test)</div></div>
+                <div class="form-group"><label>Mobile Number</label><input id="easypaisaPhone_${safeKey}" required placeholder="03xx..."/></div>
+                <div class="form-group"><label>EasyPaisa PIN</label><input id="easypaisaPIN_${safeKey}" required placeholder="12345"/></div>
+                <div style="margin-top:.6rem"><button class="btn" type="submit">Pay ${formatCurrency(subtotal)} by EasyPaisa</button></div>
+            </form>
+
+            <form id="bankForm_${safeKey}" class="group-form" style="display:none" onsubmit="processGroupedPayment('${safeKey}','bank', event)">
+                <div class="method-details"><strong>Bank Transfer</strong><div>Transfer funds to our bank account and enter the transaction reference here.</div></div>
+                <div class="form-group"><label>Reference / Transaction ID</label><input id="bankRef_${safeKey}" required></div>
+                <div style="margin-top:.6rem"><button class="btn" type="submit">Mark Bank Transfer as Paid</button></div>
+            </form>
+
+            <form id="codForm_${safeKey}" class="group-form" style="display:none" onsubmit="processGroupedPayment('${safeKey}','cod', event)">
+                <div class="method-details"><strong>Cash on Delivery</strong><div>Pay when you receive your order. Provide delivery address and instructions below.</div></div>
+                ${addressSelectHtml}
+                <div class="form-group">
+                    <label>Delivery Address</label>
+                    <textarea id="codAddress_${safeKey}" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Delivery Instructions</label>
+                    <textarea id="codInstructions_${safeKey}" rows="2"></textarea>
+                </div>
+                <div style="margin-top:.6rem"><button class="btn" type="submit">Confirm Cash on Delivery</button></div>
+            </form>
+        </div>
+    `;
+
+    container.style.display = 'block';
+}
+
+
+
+function processGroupedPayment(safeKey, method) {
+    // allow form submit to pass event as third arg
+    const event = arguments[2];
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
+
+    // find group items
+    const groups = {};
+    cart.forEach(item => {
+        const key = item.sellerId != null ? `seller_${item.sellerId}` : `seller_${(item.sellerName || item.artisan || 'unknown').replace(/\s+/g, '_')}`;
+        if (!groups[key]) groups[key] = { key, items: [], sellerId: item.sellerId || null, sellerName: item.sellerName || item.artisan || 'Seller' };
+        groups[key].items.push(item);
+    });
+    const group = Object.values(groups).find(g => g.key.replace(/[^a-zA-Z0-9_-]/g, '_') === safeKey);
+    if (!group) return showToast('Group not found');
+
+    let deliveryAddress = '';
+    let deliveryInstruction = '';
+    let paymentRef = `${method.toUpperCase()}_REF_${Date.now()}`;
+    let paymentLabel = '';
+
+    if (method === 'card') {
+        const cardNumber = document.getElementById(`cardNumber_${safeKey}`)?.value.replace(/\s/g, '') || '';
+        const name = document.getElementById(`cardName_${safeKey}`)?.value || '';
+        const expiry = document.getElementById(`cardExpiry_${safeKey}`)?.value || '';
+        const cvc = document.getElementById(`cardCVC_${safeKey}`)?.value || '';
+        if (!cardNumber || !name || !expiry || !cvc) return showToast('Please complete card details');
+        if (cardNumber !== '4242424242424242' && cardNumber !== '4111111111111111') return showToast('Test card declined. Use 4242 4242 4242 4242');
+        paymentRef = `${name} - ****${cardNumber.slice(-4)}`;
+        paymentLabel = 'Credit Card';
+    } else if (method === 'easypaisa') {
+        const phone = document.getElementById(`easypaisaPhone_${safeKey}`)?.value || '';
+        const pin = document.getElementById(`easypaisaPIN_${safeKey}`)?.value || '';
+        if (!phone || !pin) return showToast('Please provide EasyPaisa details');
+        if (pin !== '12345') return showToast('Invalid EasyPaisa PIN');
+        paymentRef = phone;
+        paymentLabel = 'EasyPaisa';
+    } else if (method === 'bank') {
+        const ref = document.getElementById(`bankRef_${safeKey}`)?.value || '';
+        if (!ref) return showToast('Please provide bank transfer reference');
+        paymentRef = ref;
+        paymentLabel = 'Bank Transfer';
+    } else if (method === 'cod') {
+        deliveryAddress = document.getElementById(`codAddress_${safeKey}`)?.value || '';
+        deliveryInstruction = document.getElementById(`codInstructions_${safeKey}`)?.value || '';
+        paymentLabel = 'Cash on Delivery';
+    }
+
+    // Show inline processing
+    const container = document.getElementById(`group_payment_${safeKey}`) || document.getElementById(`select_${safeKey}`);
+    const original = container ? container.innerHTML : '';
+    if (container) container.innerHTML = `<div class="payment-processing"><div class="spinner"></div><p>Processing ${method} payment for ${group.sellerName}...</p></div>`;
+
+    setTimeout(() => {
+        completeOrderForSeller(group, paymentLabel || method, paymentRef, deliveryInstruction, deliveryAddress);
+        // collapse group payment UI
+        if (container) {
+            container.innerHTML = original;
+            if (container.id && container.id.startsWith('group_payment_')) container.style.display = 'none';
+        }
+    }, 1200);
+}
+
+function completeOrderForSeller(group, paymentMethod, paymentRef, deliveryInstruction = '', deliveryAddress = '') {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+    if (!currentUser) return showToast('Please login to complete payment');
+
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+    const orderItems = group.items.map(item => {
+        const quantity = item.quantity || item.qty || 1;
+        const itemTotal = (item.price || 0) * quantity;
+        const itemCommission = +(itemTotal * COMMISSION_RATE).toFixed(2);
+        const sellerPayout = +(itemTotal - itemCommission).toFixed(2);
+        return { ...item, quantity, itemTotal, platformCommission: itemCommission, sellerPayout, commissionRate: COMMISSION_RATE };
+    });
+
+    const orderTotal = orderItems.reduce((sum, it) => sum + (it.itemTotal || 0), 0);
+    const orderCommission = orderItems.reduce((sum, it) => sum + (it.platformCommission || 0), 0);
+    const orderSellerPayout = +(orderTotal - orderCommission).toFixed(2);
+
+    const order = {
+        id: 'ord_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+        buyerId: currentUser.id,
+        buyerName: currentUser.name,
+        buyerEmail: currentUser.email,
+        buyerPhone: currentUser.phone || '',
+        items: orderItems,
+        total: orderTotal,
+        platformCommission: orderCommission,
+        sellerPayout: orderSellerPayout,
+        status: 'pending',
+        paymentMethod: paymentMethod,
+        paymentRef: paymentRef,
+        deliveryInstruction: deliveryInstruction,
+        deliveryAddress: deliveryAddress,
+        transactionId: 'TXN_' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+        createdAt: new Date().toISOString()
+    };
+
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    // decrement stock for these items
+    group.items.forEach(item => {
+        const p = products.find(pp => pp.id === item.id);
+        if (p) {
+            p.stock = Math.max(0, p.stock - (item.quantity || item.qty || 1));
+            if (p.stock === 0) p.status = 'sold-out';
+        }
+    });
+    saveProducts();
+
+    // remove group items from cart
+    const remaining = cart.filter(c => !group.items.some(gi => String(gi.id) === String(c.id)));
+    cart = remaining;
+    saveCartToStorage();
+    updateCart();
+    renderProducts(currentCategory);
+
+    showToast(`Payment successful — Order ${order.id}`);
+
+    // Update payment modal: remove the paid seller's entry and close modal if none left
+    try {
+        const paymentModal = document.getElementById('paymentModal');
+        if (paymentModal) {
+            const safeKey = String(group.key).replace(/[^a-zA-Z0-9_-]/g, '_');
+            const selectEl = document.getElementById(`select_${safeKey}`);
+            if (selectEl) selectEl.remove();
+
+            // If no more sellers left in the modal, close it
+            const remaining = paymentModal.querySelectorAll('input[name="selectedSeller"]');
+            if (!remaining || remaining.length === 0) {
+                closePaymentModal();
+            } else {
+                // Ensure one seller is selected
+                const first = remaining[0];
+                if (first && !first.checked) first.checked = true;
+            }
+        }
+    } catch (e) {
+        // silently ignore DOM errors
+    }
+}
+
+// Called from the simpler selection modal to proceed
+function proceedToSellerPayment() {
+    const selected = document.querySelector('input[name="selectedSeller"]:checked');
+    if (!selected) return showToast('Please select a seller to proceed');
+    const safeKey = selected.value;
+    // Ensure the group's payment container exists and open payment methods
+    const container = document.getElementById(`group_payment_${safeKey}`);
+    if (!container) {
+        showToast('Unable to proceed to payment for the selected seller');
+        return;
+    }
+    // Use existing openGroupPayment to render payment options for the selected seller
+    openGroupPayment(safeKey);
+    // Scroll the payment modal to the selected group's payment area
+    setTimeout(() => {
+        const el = document.getElementById(`group_payment_${safeKey}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 150);
+}
+
+function selectGroupPaymentMethod(safeKey, method) {
+    const methods = ['card', 'easypaisa', 'bank', 'cod'];
+    methods.forEach(m => {
+        const el = document.getElementById(`${m}Form_${safeKey}`);
+        if (el) el.style.display = (m === method) ? 'block' : 'none';
+    });
+    // highlight selected tile
+    try {
+        const container = document.getElementById(`methods_${safeKey}`);
+        if (container) {
+            container.querySelectorAll('.method-tile').forEach(btn => {
+                if (btn.dataset && btn.dataset.method === method) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+    } catch (e) {}
+    // scroll into view the selected form
+    setTimeout(() => {
+        const form = document.getElementById(`${method}Form_${safeKey}`);
+        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+}
+
+function syncCodAddressSelectFor(safeKey) {
+    const select = document.getElementById(`codAddressSelect_${safeKey}`);
+    const addressField = document.getElementById(`codAddress_${safeKey}`);
+    if (!select || !addressField) return;
+
+    const selected = select.value;
+    if (selected === 'custom') {
+        addressField.value = '';
+        addressField.focus();
+        return;
+    }
+
+    const address = getBuyerAddresses().find(a => String(a.id) === String(selected));
+    if (address) {
+        addressField.value = formatAddressForCheckout(address);
+    }
 }

@@ -227,9 +227,14 @@ function initDashboard() {
     } else if (currentUser.role === 'seller') {
         loadSellerStats();
         loadSellerProducts();
+        loadSellerProfile();
     } else if (currentUser.role === 'buyer') {
         loadBuyerStats();
         loadBuyerProfile();
+    }
+    
+    if (currentUser.role === 'admin') {
+        loadAdminActivity();
     }
     
     // Load overview by default
@@ -246,12 +251,60 @@ function loadAdminStats() {
     const sellers = users.filter(u => u.role === 'seller');
     const totalRevenue = orders
         .filter(o => o.status === 'delivered')
-        .reduce((sum, o) => sum + (o.total || 0), 0);
+        .reduce((sum, o) => sum + (o.platformCommission || 0), 0);
     
+
+function loadAdminActivity() {
+    const activityList = document.getElementById('activityList');
+    if (!activityList) return;
+
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const recentOrders = orders.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+
+    activityList.innerHTML = recentOrders.map(order => {
+        const item = (order.items || [])[0] || {};
+        const sellerNames = Array.from(new Set((order.items || []).map(i => i.sellerName || 'Seller'))).join(', ');
+        return `
+            <div class="notification-item">
+                <i class="fas fa-dollar-sign"></i>
+                <div>
+                    <p><strong>Order ${order.id}</strong> processed - <strong>Commission:</strong> PKR ${(order.platformCommission || 0).toFixed(2)}</p>
+                    <p><small>Buyer: ${order.buyerName || 'Unknown'}, Seller: ${sellerNames}</small></p>
+                    <p><small>Product: ${item.name || item.title || 'N/A'} | Status: ${order.status || 'pending'}</small></p>
+                    <small>${order.createdAt ? new Date(order.createdAt).toLocaleString() : ''}</small>
+                </div>
+            </div>
+        `;
+    }).join('') || '<p>No recent transactions yet.</p>';
+}
     updateElement('totalBuyers', buyers.length);
     updateElement('totalSellers', sellers.length);
     updateElement('totalProducts', products.length);
     updateElement('totalRevenue', 'PKR ' + totalRevenue.toFixed(2));
+}
+
+function loadAdminActivity() {
+    const activityList = document.getElementById('activityList');
+    if (!activityList) return;
+
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const recentOrders = orders.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+
+    activityList.innerHTML = recentOrders.map(order => {
+        const item = (order.items || [])[0] || {};
+        const sellerNames = Array.from(new Set((order.items || []).map(i => i.sellerName || 'Seller'))).join(', ');
+        return `
+            <div class="notification-item">
+                <i class="fas fa-dollar-sign"></i>
+                <div>
+                    <p><strong>Order ${order.id}</strong> processed - <strong>Commission:</strong> PKR ${(order.platformCommission || 0).toFixed(2)}</p>
+                    <p><small>Buyer: ${order.buyerName || 'Unknown'}, Seller: ${sellerNames}</small></p>
+                    <p><small>Product: ${item.name || item.title || 'N/A'} | Status: ${order.status || 'pending'}</small></p>
+                    <small>${order.createdAt ? new Date(order.createdAt).toLocaleString() : ''}</small>
+                </div>
+            </div>
+        `;
+    }).join('') || '<p>No recent transactions yet.</p>';
 }
 
 // ==================== ADMIN: USER MANAGEMENT ====================
@@ -723,17 +776,115 @@ function rejectProduct(productId) {
 function loadSellerStats() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const products = JSON.parse(localStorage.getItem('products')) || [];
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
     const myProducts = products.filter(p => p.sellerId === currentUser.id);
-    
+    const myOrders = orders.filter(o => (o.items || []).some(i => String(i.sellerId) === String(currentUser.id)));
+    const deliveredOrders = myOrders.filter(o => o.status === 'delivered');
+
+    const grossSales = deliveredOrders.reduce((sum, o) => {
+        return sum + (o.items || []).reduce((s, item) => {
+            if (String(item.sellerId) !== String(currentUser.id)) return s;
+            const qty = item.quantity || item.qty || 1;
+            return s + ((item.price || 0) * qty);
+        }, 0);
+    }, 0);
+
+    const totalCommission = deliveredOrders.reduce((sum, o) => {
+        return sum + (o.items || []).reduce((s, item) => {
+            if (String(item.sellerId) !== String(currentUser.id)) return s;
+            const qty = item.quantity || item.qty || 1;
+            const itemAmount = (item.price || 0) * qty;
+            const commission = item.platformCommission != null ? item.platformCommission : itemAmount * 0.1;
+            return s + commission;
+        }, 0);
+    }, 0);
+
+    const sellerRevenue = grossSales - totalCommission;
     updateElement('sellerProductCount', myProducts.length);
     updateElement('approvedProductCount', myProducts.filter(p => p.status === 'approved').length);
     updateElement('pendingProductCount', myProducts.filter(p => p.status === 'pending').length);
-    
-    // Update profile fields
-    updateElement('profileShopName', currentUser.shopName || '');
-    updateElement('profileName', currentUser.name || '');
-    updateElement('profileEmail', currentUser.email || '');
-    updateElement('profilePhone', currentUser.phone || '');
+    updateElement('sellerGrossEarnings', 'PKR ' + grossSales.toFixed(2));
+    updateElement('sellerRevenue', 'PKR ' + sellerRevenue.toFixed(2));
+    // Compute pending earnings (non-delivered, non-cancelled)
+    const pendingOrders = myOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
+    const pendingEarnings = pendingOrders.reduce((sum, o) => {
+        return sum + (o.items || []).reduce((s, item) => {
+            if (String(item.sellerId) !== String(currentUser.id)) return s;
+            const qty = item.quantity || item.qty || 1;
+            return s + ((item.price || 0) * qty);
+        }, 0);
+    }, 0);
+
+    // Commission earned by platform from seller's delivered orders
+    const commissionEarned = totalCommission;
+
+    updateElement('sellerPendingEarnings', 'PKR ' + pendingEarnings.toFixed(2));
+    updateElement('sellerTotalCommission', 'PKR ' + commissionEarned.toFixed(2));
+    updateElement('sellerShopName', currentUser.shopName || currentUser.name || 'My Shop');
+    const sellerStatus = document.getElementById('sellerStatus');
+    if (sellerStatus) sellerStatus.textContent = currentUser.status || 'Pending';
+}
+
+function loadSellerProfile() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+    const profileShopName = document.getElementById('profileShopName');
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profilePhone = document.getElementById('profilePhone');
+    const profileBio = document.getElementById('profileBio');
+    const sellerName = document.getElementById('sellerName');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const sellerAvatar = document.getElementById('sellerAvatar');
+
+    if (profileShopName) profileShopName.value = currentUser.shopName || currentUser.name || '';
+    if (profileName) profileName.value = currentUser.name || '';
+    if (profileEmail) profileEmail.value = currentUser.email || '';
+    if (profilePhone) profilePhone.value = currentUser.phone || '';
+    if (profileBio) profileBio.value = currentUser.sellerBio || '';
+    if (sellerName) sellerName.textContent = currentUser.shopName || currentUser.name || 'Seller';
+    if (headerAvatar) headerAvatar.textContent = (currentUser.name || currentUser.shopName || 'S').charAt(0).toUpperCase();
+    if (sellerAvatar) sellerAvatar.textContent = (currentUser.name || currentUser.shopName || 'S').charAt(0).toUpperCase();
+}
+
+function updateProfile(event) {
+    event.preventDefault();
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    const shopName = document.getElementById('profileShopName')?.value.trim();
+    const name = document.getElementById('profileName')?.value.trim();
+    const phone = document.getElementById('profilePhone')?.value.trim();
+    const bio = document.getElementById('profileBio')?.value.trim();
+
+    if (!shopName || !name) {
+        return showToast('Shop name and owner name are required.', 'error');
+    }
+
+    currentUser.shopName = shopName;
+    currentUser.name = name;
+    currentUser.phone = phone;
+    currentUser.sellerBio = bio;
+
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    if (userIndex !== -1) {
+        users[userIndex] = { ...users[userIndex], ...currentUser };
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    loadSellerProfile();
+    loadSellerStats();
+    showToast('Profile updated successfully.');
+}
+
+function getSellerOrderPayout(order, sellerId) {
+    const items = order.items || [];
+    return items.reduce((sum, item) => {
+        if (String(item.sellerId) !== String(sellerId)) return sum;
+        const quantity = item.quantity || item.qty || 1;
+        const itemAmount = (item.price || 0) * quantity;
+        const commission = item.platformCommission != null ? item.platformCommission : itemAmount * 0.1;
+        return sum + (itemAmount - commission);
+    }, 0);
 }
 
 function handleAddProduct(event) {
@@ -745,9 +896,11 @@ function handleAddProduct(event) {
         id: 'prod_' + Date.now(),
         title: document.getElementById('productName').value,
         name: document.getElementById('productName').value,
+        artisan: currentUser.shopName || currentUser.name,
         category: document.getElementById('productCategory').value,
         price: parseFloat(document.getElementById('productPrice').value),
         stock: parseInt(document.getElementById('productStock').value),
+        rating: 4.5,
         description: document.getElementById('productDescription').value,
         image: document.getElementById('productImage').value || 'https://via.placeholder.com/400',
         sellerId: currentUser.id,
@@ -1081,6 +1234,11 @@ function updateElement(id, value) {
 
 function loadSectionData(sectionId) {
     switch(sectionId) {
+        case 'overview':
+            if (JSON.parse(localStorage.getItem('currentUser'))?.role === 'admin') {
+                loadAdminActivity();
+            }
+            break;
         case 'sellers':
             loadSellersTable('all');
             break;
@@ -1117,42 +1275,98 @@ function loadOrdersTable() {
         list = orders.filter(o => o.buyerId === currentUser.id);
     }
 
-    const tbody = document.getElementById('ordersTableBody') || document.getElementById('buyerOrdersTableBody');
+    const tbody = document.getElementById('ordersTableBody') || document.getElementById('buyerOrdersTableBody') || document.getElementById('sellerOrdersTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = list.map(o => `
-        <tr>
-            <td>${o.id || ('ord_' + o.createdAt)}</td>
-            <td>${o.buyerName || 'N/A'}</td>
-            <td>${(o.items || []).length}</td>
-            <td>PKR ${((o.total)||0).toFixed(2)}</td>
-            <td>${o.status || 'pending'}</td>
-            <td>${new Date(o.createdAt).toLocaleDateString()}</td>
-            <td>
-                <button class="btn-action view" onclick="viewOrder('${o.id}')">View</button>
-                ${currentUser.role === 'admin' ? `
-                    ${o.status !== 'delivered' && o.status !== 'cancelled' ? `
-                        <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')" title="Mark Delivered">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="btn-action reject" onclick="updateOrderStatus('${o.id}', 'cancelled')" title="Cancel Order">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    ` : ''}
-                ` : ''}
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = list.map(o => {
+        // Admin: show full order including commission
+        if (currentUser.role === 'admin') {
+            return `
+                <tr>
+                    <td>${o.id || ('ord_' + o.createdAt)}</td>
+                    <td>${o.buyerName || 'N/A'}</td>
+                    <td>${(o.items || []).length}</td>
+                    <td>PKR ${((o.total)||0).toFixed(2)}</td>
+                    <td>PKR ${((o.platformCommission)||0).toFixed(2)}</td>
+                    <td>${o.status || 'pending'}</td>
+                    <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-action view" onclick="viewOrder('${o.id}')">View</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Seller: only include items that belong to this seller and compute seller-specific totals
+        if (currentUser.role === 'seller') {
+            const sellerItems = (o.items || []).filter(i => String(i.sellerId) === String(currentUser.id));
+            if (!sellerItems.length) return '';
+
+            const sellerItemCount = sellerItems.reduce((c, it) => c + (it.quantity || it.qty || 1), 0);
+            const sellerTotal = sellerItems.reduce((s, it) => s + ((it.price || 0) * (it.quantity || it.qty || 1)), 0);
+
+            return `
+                <tr>
+                    <td>${o.id || ('ord_' + o.createdAt)}</td>
+                    <td>${o.buyerName || 'N/A'}</td>
+                    <td>${sellerItemCount}</td>
+                    <td>PKR ${sellerTotal.toFixed(2)}</td>
+                    <td>${o.status || 'pending'}</td>
+                    <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-action view" onclick="viewOrder('${o.id}')">View</button>
+                        ${o.status === 'pending' ? `
+                            <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'shipped')" title="Mark Shipped">
+                                <i class="fas fa-truck"></i>
+                            </button>
+                        ` : ''}
+                        ${o.status !== 'delivered' && o.status !== 'cancelled' ? `
+                            <button class="btn-action approve" onclick="updateOrderStatus('${o.id}', 'delivered')" title="Mark Delivered">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn-action reject" onclick="updateOrderStatus('${o.id}', 'cancelled')" title="Cancel Order">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Buyer / fallback: show full order
+        return `
+            <tr>
+                <td>${o.id || ('ord_' + o.createdAt)}</td>
+                <td>${o.buyerName || 'N/A'}</td>
+                <td>${(o.items || []).length}</td>
+                <td>PKR ${((o.total)||0).toFixed(2)}</td>
+                <td>${o.status || 'pending'}</td>
+                <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn-action view" onclick="viewOrder('${o.id}')">View</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function viewOrder(orderId) {
     const orders = JSON.parse(localStorage.getItem('orders')) || [];
     const o = orders.find(x => String(x.id) === String(orderId));
     if (!o) return showToast('Order not found', 'error');
-    const items = (o.items || []).map(i => `${i.name} x${i.quantity || i.qty || 1} - PKR ${((i.price)||0).toFixed(2)}`).join('\n');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+    let itemsToShow = o.items || [];
+    if (currentUser.role === 'seller') {
+        itemsToShow = (o.items || []).filter(i => String(i.sellerId) === String(currentUser.id));
+    }
+    const items = itemsToShow.map(i => `${i.name} x${i.quantity || i.qty || 1} - PKR ${((i.price)||0).toFixed(2)}`).join('\n');
     const instructions = o.deliveryInstruction ? `\nDelivery Instructions: ${o.deliveryInstruction}` : '';
     const address = o.deliveryAddress ? `\nDelivery Address: ${o.deliveryAddress}` : '';
-    alert(`Order ${o.id}\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail || 'N/A'}\nPhone: ${o.buyerPhone || 'N/A'}\nItems:\n${items}\n\nTotal: PKR ${((o.total)||0).toFixed(2)}\nStatus: ${o.status || 'pending'}\nPayment: ${o.paymentMethod}\nReference: ${o.paymentRef}${address}${instructions}`);
+    const totalToShow = (currentUser.role === 'seller')
+        ? itemsToShow.reduce((s, it) => s + ((it.price || 0) * (it.quantity || it.qty || 1)), 0)
+        : (o.total || 0);
+
+    alert(`Order ${o.id}\nBuyer: ${o.buyerName}\nEmail: ${o.buyerEmail || 'N/A'}\nPhone: ${o.buyerPhone || 'N/A'}\nItems:\n${items}\n\nTotal: PKR ${((totalToShow)||0).toFixed(2)}\nStatus: ${o.status || 'pending'}\nPayment: ${o.paymentMethod}\nReference: ${o.paymentRef}${address}${instructions}`);
 }
 
 function updateOrderStatus(orderId, status) {
@@ -1167,6 +1381,7 @@ function updateOrderStatus(orderId, status) {
     showToast(`Order marked ${status}.`);
     loadOrdersTable();
     loadAdminStats();
+    loadSellerStats();
 }
 
 function viewProduct(productId) {

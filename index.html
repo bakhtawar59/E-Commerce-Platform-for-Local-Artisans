@@ -383,13 +383,13 @@
                     <div class="product-img" style="background-image: url('${product.image}')">
                         ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
                         <div class="product-actions">
-                            <button class="action-btn" onclick="quickView(${product.id})" title="Quick View">
+                            <button class="action-btn" onclick="quickView('${product.id}')" title="Quick View">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="action-btn" onclick="addToCart(${product.id})" title="Add to Cart">
+                            <button class="action-btn" onclick="addToCart('${product.id}')" title="Add to Cart">
                                 <i class="fas fa-shopping-cart"></i>
                             </button>
-                            <button class="action-btn" onclick="showToast('Added to wishlist!')" title="Wishlist">
+                            <button class="action-btn" onclick="toggleWishlist('${product.id}')" title="Wishlist">
                                 <i class="fas fa-heart"></i>
                             </button>
                         </div>
@@ -438,13 +438,14 @@
 
         // Quick View
         function quickView(id) {
-            const product = products.find(p => p.id === id);
+            const product = products.find(p => String(p.id) === String(id));
+            if (!product) return showToast('Product not found', 'error');
             currentModalProduct = product;
             
             document.getElementById('modalImg').style.backgroundImage = `url('${product.image}')`;
-            document.getElementById('modalTitle').textContent = product.title;
-            document.getElementById('modalPrice').textContent = `PKR ${product.price.toFixed(2)}`;
-            document.getElementById('modalDesc').textContent = product.description;
+            document.getElementById('modalTitle').textContent = product.title || product.name;
+            document.getElementById('modalPrice').textContent = `PKR ${Number(product.price || 0).toFixed(2)}`;
+            document.getElementById('modalDesc').textContent = product.description || '';
             
             document.getElementById('quickViewModal').classList.add('active');
         }
@@ -462,17 +463,20 @@
 
         // Cart Functions
         function addToCart(id) {
-            const product = products.find(p => p.id === id);
-            const existingItem = cart.find(item => item.id === id);
-            
+            const product = products.find(p => String(p.id) === String(id));
+            if (!product) return showToast('Product not found', 'error');
+            if (product.stock === 0) return showToast('This product is sold out', 'error');
+
+            const existingItem = cart.find(item => String(item.id) === String(id));
             if (existingItem) {
+                if (existingItem.quantity >= (product.stock || 1)) return showToast('No more stock available for this product', 'error');
                 existingItem.quantity++;
             } else {
                 cart.push({ ...product, quantity: 1 });
             }
             
             updateCart();
-            showToast(`${product.title} added to cart!`);
+            showToast(`${product.title || product.name} added to cart!`);
         }
 
         function removeFromCart(id) {

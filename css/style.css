@@ -2077,6 +2077,73 @@ footer {
     font-size: 0.95rem;
 }
 
+/* Seller selection list styling inside payment modal */
+.seller-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+.seller-select {
+    background: rgba(250,246,242,0.9);
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+.seller-select label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+.seller-items {
+    margin-top: 0.6rem;
+    color: var(--text);
+    font-size: 0.95rem;
+}
+.seller-actions { text-align: center; }
+.seller-actions .btn { min-width: 260px; }
+
+/* Payment modal quick method buttons - make them pill-shaped like older design */
+.payment-method-quick { display:flex; flex-wrap:wrap; gap:0.6rem; margin: 0.8rem 0; }
+.payment-method-quick .btn {
+    background: var(--secondary);
+    color: var(--text);
+    padding: 0.9rem 1.6rem;
+    border-radius: 28px;
+    box-shadow: 0 8px 18px rgba(244,164,96,0.25);
+    font-weight: 700;
+    min-width: 180px;
+}
+.payment-method-quick .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(244,164,96,0.22); }
+
+/* New tile-style for payment methods to match Secure Payment design */
+.payment-method-quick .method-tile {
+    display:flex;
+    align-items:center;
+    gap:0.9rem;
+    width:100%;
+    background:transparent;
+    border:1px solid rgba(0,0,0,0.06);
+    padding:0.9rem 1rem;
+    border-radius:12px;
+    text-align:left;
+    color:var(--primary);
+    font-weight:600;
+}
+.payment-method-quick .method-tile i { width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; background:rgba(244,164,96,0.08); border-radius:8px; color:var(--secondary); }
+.payment-method-quick .method-tile span { flex:1; }
+.payment-method-quick .method-tile.active { background:#fff; border:2px solid var(--secondary); box-shadow:0 8px 30px rgba(244,164,96,0.08); }
+.payment-method-quick .method-tile:hover { transform: translateY(-2px); }
+
+.group-form { background: transparent; padding: 0.6rem 0; }
+.group-form .form-group { margin-bottom: 0.6rem; }
+.group-form input, .group-form textarea, .group-form select { width:100%; padding:0.6rem; border-radius:8px; border:1px solid rgba(0,0,0,0.08); }
+.group-form .btn { border-radius:26px; display:inline-block; margin-top:6px; }
+
+.method-details { background:#fff; border:1px solid #f0e6da; padding:0.9rem; border-radius:10px; margin-bottom:0.8rem; color:var(--text); }
+.method-details strong { display:block; color:var(--primary); margin-bottom:0.3rem; }
+
 .payment-amount {
     display: flex;
     justify-content: space-between;
