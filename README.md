@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+HEAD
 # E-Commerce Platform for Local Artisans
 
 A static e-commerce marketplace website for Pakistani handicrafts built with HTML, CSS, and JavaScript.
@@ -84,6 +84,7 @@ This project is static and can be deployed directly to:
 - Admin: `admin@artisancraft.pk` / `admin123`
 - Seller: `ayesha@artisancraft.pk` / `seller123`
 - Buyer: `asad@artisancraft.pk` / `buyer123`
-=======
+
 # E-Commerce-Platform-for-Local-Artisans
->>>>>>> c4d6819752881a97be54a24f44dd90c3d0940b52
+
+c4d6819752881a97be54a24f44dd90c3d0940b52
