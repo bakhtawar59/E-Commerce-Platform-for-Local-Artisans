@@ -35,7 +35,7 @@ const defaultProducts = [
         sellerName: "Multan Blue Pottery",
         price: 3450.00,
         category: "pottery",
-        image: "https://unsplash.com/photos/stack-of-blue-and-white-floral-patterned-ceramic-bowls-u0z0_o9hHOY",
+        image: "https://images.unsplash.com/photo-1760124056943-eb64936d3d2a?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         rating: 4.8,
         badge: "Featured",
         description: "Hand-painted blue pottery bowl made in Multan using traditional craftsmanship.",

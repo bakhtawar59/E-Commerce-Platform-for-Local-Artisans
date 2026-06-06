@@ -5,91 +5,123 @@ const COMMISSION_RATE = 0.10;
 const defaultProducts = [
     {
         id: 1,
-        title: "Blue Pottery Serving Bowl",
+        name: "Blue Pottery Serving Bowl",
         artisan: "Ayesha Khan",
+        sellerName: "Multan Blue Pottery",
         price: 3450.00,
         category: "pottery",
-        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://images.unsplash.com/photo-1760124056943-eb64936d3d2a?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         rating: 4.8,
         badge: "Featured",
-        description: "Hand-painted blue pottery bowl made in Multan using traditional craftsmanship."
+        description: "Hand-painted blue pottery bowl made in Multan using traditional craftsmanship.",
+        status: 'approved',
+        stock: 10,
+        createdAt: new Date().toISOString()
     },
     {
         id: 2,
-        title: "Ajrak Cushion Cover",
+        name: "Ajrak Cushion Cover",
         artisan: "Sana Baloch",
+        sellerName: "Sindh Textiles",
         price: 2850.00,
         category: "textiles",
-        image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://unsplash.com/photos/three-assorted-color-throw-pillows-on-black-sofa-GWFFvub7Y1U",
         rating: 4.9,
         badge: "New",
-        description: "Authentic Ajrak cushion cover hand-printed in Sindh with rich colors."
+        description: "Authentic Ajrak cushion cover hand-printed in Sindh with rich colors.",
+        status: 'approved',
+        stock: 8,
+        createdAt: new Date().toISOString()
     },
     {
         id: 3,
-        title: "Carved Sheesham Serving Tray",
+        name: "Carved Sheesham Serving Tray",
         artisan: "Ali Raza",
+        sellerName: "Lahore Woodworks",
         price: 4200.00,
         category: "woodwork",
-        image: "https://images.unsplash.com/photo-1587913844347-572393ce05b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://decoracrafts.shop/wp-content/uploads/2025/09/10.png",
         rating: 4.7,
         badge: null,
-        description: "Carved sheesham wood tray with polished finish, handcrafted in Lahore."
+        description: "Carved sheesham wood tray with polished finish, handcrafted in Lahore.",
+        status: 'approved',
+        stock: 6,
+        createdAt: new Date().toISOString()
     },
     {
         id: 4,
-        title: "Silver Jhumka Earrings",
+        name: "Silver Jhumka Earrings",
         artisan: "Mariam Shah",
+        sellerName: "Karachi Silver Studio",
         price: 2100.00,
         category: "jewelry",
-        image: "https://images.unsplash.com/photo-1512436995084-1c8a4b69cd9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://unsplash.com/photos/a-pair-of-silver-and-gold-earrings-LBvg2FW_VII",
         rating: 4.6,
         badge: "Popular",
-        description: "Classic silver jhumka earrings handcrafted by Peshawari silversmiths."
+        description: "Classic silver jhumka earrings handcrafted by Peshawari silversmiths.",
+        status: 'approved',
+        stock: 12,
+        createdAt: new Date().toISOString()
     },
     {
         id: 5,
-        title: "Embroidered Shawl",
+        name: "Embroidered Shawl",
         artisan: "Nadia Iqbal",
+        sellerName: "Kashmir Looms",
         price: 6200.00,
         category: "textiles",
-        image: "https://images.unsplash.com/photo-1520975911099-9c1fbc2440fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://unsplash.com/photos/white-fabric-with-dark-floral-embroidery-pattern-R_uayLKqDL8",
         rating: 4.8,
         badge: null,
-        description: "Soft embroidered shawl with intricate Kashmiri paisley motifs."
+        description: "Soft embroidered shawl with intricate Kashmiri paisley motifs.",
+        status: 'approved',
+        stock: 7,
+        createdAt: new Date().toISOString()
     },
     {
         id: 6,
-        title: "Terracotta Planter Set",
+        name: "Terracotta Planter Set",
         artisan: "Hassan Ali",
+        sellerName: "Gujranwala Clay Works",
         price: 1950.00,
         category: "pottery",
-        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://unsplash.com/photos/a-white-and-pink-vase-with-a-plant-in-it-MpL7mgRoqfY",
         rating: 4.5,
         badge: "Sale",
-        description: "Rustic terracotta planter set made by clay artisans in Gujranwala."
+        description: "Rustic terracotta planter set made by clay artisans in Gujranwala.",
+        status: 'approved',
+        stock: 14,
+        createdAt: new Date().toISOString()
     },
     {
         id: 7,
-        title: "Bamboo Lantern",
+        name: "Bamboo Lantern",
         artisan: "Zainab Khan",
+        sellerName: "Karachi Bamboo",
         price: 5200.00,
         category: "woodwork",
-        image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://unsplash.com/photos/a-wicker-lantern-hanging-from-a-ceiling-09YSitq__rE",
         rating: 4.9,
         badge: "Eco-Friendly",
-        description: "Handwoven bamboo lantern for warm ambient lighting."
+        description: "Handwoven bamboo lantern for warm ambient lighting.",
+        status: 'approved',
+        stock: 5,
+        createdAt: new Date().toISOString()
     },
     {
         id: 8,
-        title: "Sindhi Mirror Necklace",
+        name: "Sindhi Mirror Necklace",
         artisan: "Amina Qureshi",
+        sellerName: "Sindh Jewelry Hub",
         price: 3050.00,
         category: "jewelry",
-        image: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+        image: "https://tse4.mm.bing.net/th/id/OIP.Sx9dL9T1kuzwYGJTEBs0CAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
         rating: 4.7,
         badge: null,
-        description: "Handcrafted Sindhi mirror necklace with traditional decorative details."
+        description: "Handcrafted Sindhi mirror necklace with traditional decorative details.",
+        status: 'approved',
+        stock: 9,
+        createdAt: new Date().toISOString()
     }
 ];
 
